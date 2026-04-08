@@ -10,9 +10,9 @@ const PORT = 4000;
  * Notice latency is now 0. It will be calculated dynamically!
  */
 let nodes = [
-    { name: "A", region: "America", url: "http://10.105.25.181:3001", latency: 0, active: 0, healthy: true },
-    { name: "B", region: "Europe",  url: "http://10.105.25.181:3002", latency: 0, active: 0, healthy: true },
-    { name: "C", region: "Asia",    url: "http://10.105.25.181:3003", latency: 0, active: 0, healthy: true }
+    { name: "A", region: "America", url: "http://192.168.236.181:3001", latency: 0, active: 0, healthy: true },
+    { name: "B", region: "Europe",  url: "http://192.168.236.181:3002", latency: 0, active: 0, healthy: true },
+    { name: "C", region: "Asia",    url: "http://192.168.236.181:3003", latency: 0, active: 0, healthy: true }
 ];
 
 /**
@@ -33,23 +33,39 @@ function calculateScore(node) {
 /**
  * Utility: Get Location from IP
  */
+
 function getClientInfo(req) {
     let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    // LOCALHOST TESTING HACK: Randomly assign a global IP to test routing
-    if (clientIp === '127.0.0.1' || clientIp === '::1' || clientIp === '::ffff:127.0.0.1') {
-        const mockIps = ['8.8.8.8', '2.17.79.255', '1.1.1.1']; // US, France, Australia
+    // Handle multiple IPs (take first one)
+    if (clientIp && clientIp.includes(',')) {
+        clientIp = clientIp.split(',')[0].trim();
+    }
+
+    // Convert IPv6 to IPv4
+    if (clientIp && clientIp.startsWith('::ffff:')) {
+        clientIp = clientIp.replace('::ffff:', '');
+    }
+
+    console.log("IP:", clientIp);
+
+    // LOCALHOST TESTING HACK
+    if (!clientIp || clientIp === '127.0.0.1' || clientIp === '::1') {
+        const mockIps = ['8.8.8.8', '2.17.79.255', '1.1.1.1'];
         clientIp = mockIps[Math.floor(Math.random() * mockIps.length)];
     }
 
     const geo = geoip.lookup(clientIp);
-    let region = "America"; 
+    console.log("Geo:", geo);
+
+    let region = "America";
     let country = "Unknown";
 
     if (geo && geo.country) {
         country = geo.country;
+
         const europeCountries = ['GB', 'DE', 'FR', 'IT', 'ES', 'NL'];
-        const asiaCountries = ['IN', 'JP', 'CN', 'KR', 'SG', 'AU'];
+        const asiaCountries = ['IN', 'JP', 'CN', 'KR', 'SG']; 
 
         if (asiaCountries.includes(country)) region = "Asia";
         else if (europeCountries.includes(country)) region = "Europe";
@@ -183,6 +199,6 @@ setInterval(checkHealth, 5000);
  * Start Server
  */
 app.listen(PORT,'0.0.0.0', () => {
-    console.log(`🚀 Traffic Manager running on http://10.105.25.181:${PORT}`);
-    console.log(`📊 View live metrics at http://10.105.25.181:${PORT}/metrics`);
+    console.log(`🚀 Traffic Manager running on http://127.0.0.1:${PORT}`);
+    console.log(`📊 View live metrics at http://127.0.0.1:${PORT}/metrics`);
 });

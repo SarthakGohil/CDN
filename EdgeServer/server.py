@@ -8,7 +8,7 @@ from cache_module import Cache
 app = Flask(__name__)
 
 # --- CONFIGURATION ---
-ORIGIN_URL = "http://10.105.25.181:5000" 
+ORIGIN_URL = "http://192.168.236.181:5000" 
 
 # --- LOAD MANAGEMENT STATE ---
 active_connections = 0

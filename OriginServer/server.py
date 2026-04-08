@@ -10,9 +10,9 @@ CONTENT_DIR = "content"
 
 # Edge purge endpoints
 EDGE_NODES = [
-    "http://10.105.25.181:3001",
-    "http://10.105.25.181:3002",
-    "http://10.105.25.181:3003"
+    "http://192.168.236.181:3001",
+    "http://192.168.236.181:3002",
+    "http://192.168.236.181:3003"
 ]
 
 os.makedirs(CONTENT_DIR, exist_ok=True)
