@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  origin-server:
+    build: ./OriginServer
+    container_name: origin-server
+    ports:
+      - "5000:5000"
+    networks:
+      - cdnnet
+
+  edge-server-1:
+    build: ./EdgeServer
+    container_name: edge-server-1
+    ports:
+      - "3001:3001"
+    command: [ "python", "server.py", "3001" ]
+    environment:
+      - ORIGIN_URL=http://origin-server:5000
+    networks:
+      - cdnnet
+
+  edge-server-2:
+    build: ./EdgeServer
+    container_name: edge-server-2
+    ports:
+      - "3002:3002"
+    command: [ "python", "server.py", "3002" ]
+    environment:
+      - ORIGIN_URL=http://origin-server:5000
+    networks:
+      - cdnnet
+
+  edge-server-3:
+    build: ./EdgeServer
+    container_name: edge-server-3
+    ports:
+      - "3003:3003"
+    command: [ "python", "server.py", "3003" ]
+    environment:
+      - ORIGIN_URL=http://origin-server:5000
+    networks:
+      - cdnnet
+
+  traffic-manager:
+    build: ./TrafficManager
+    container_name: traffic-manager
+    ports:
+      - "4000:4000"
+    environment:
+      - EDGE1_URL=http://edge-server-1:3001
+      - EDGE2_URL=http://edge-server-2:3002
+      - EDGE3_URL=http://edge-server-3:3003
+    networks:
+      - cdnnet
+
+networks:
+  cdnnet:
+    driver: bridge

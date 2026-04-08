@@ -1,6 +1,9 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import geoip from 'geoip-lite';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = 4000;
@@ -10,9 +13,9 @@ const PORT = 4000;
  * Notice latency is now 0. It will be calculated dynamically!
  */
 let nodes = [
-    { name: "A", region: "America", url: "http://192.168.236.181:3001", latency: 0, active: 0, healthy: true },
-    { name: "B", region: "Europe",  url: "http://192.168.236.181:3002", latency: 0, active: 0, healthy: true },
-    { name: "C", region: "Asia",    url: "http://192.168.236.181:3003", latency: 0, active: 0, healthy: true }
+    { name: "A", region: "America", url: `${process.env.EDGE_URL_A}:3001`, latency: 0, active: 0, healthy: true },
+    { name: "B", region: "Europe",  url: `${process.env.EDGE_URL_B}:3002`, latency: 0, active: 0, healthy: true },
+    { name: "C", region: "Asia",    url: `${process.env.EDGE_URL_C}:3003`, latency: 0, active: 0, healthy: true }
 ];
 
 /**
@@ -198,7 +201,7 @@ setInterval(checkHealth, 5000);
 /**
  * Start Server
  */
-app.listen(PORT,'0.0.0.0', () => {
-    console.log(`🚀 Traffic Manager running on http://127.0.0.1:${PORT}`);
-    console.log(`📊 View live metrics at http://127.0.0.1:${PORT}/metrics`);
+app.listen(PORT,() => {
+    console.log(`Traffic Manager running on ${PORT}`);
+    console.log(`View live metrics at ${PORT}/metrics`);
 });

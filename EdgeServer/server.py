@@ -4,11 +4,16 @@ import threading
 import time # <--- ADD THIS
 from flask import Flask, jsonify, Response
 from cache_module import Cache
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
+print(os.getenv("ORIGIN_URL"))
 
 # --- CONFIGURATION ---
-ORIGIN_URL = "http://192.168.236.181:5000" 
+ORIGIN_URL = os.getenv("ORIGIN_URL")+":5000" 
 
 # --- LOAD MANAGEMENT STATE ---
 active_connections = 0

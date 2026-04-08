@@ -3,6 +3,9 @@ import os
 import time
 import requests
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -10,9 +13,9 @@ CONTENT_DIR = "content"
 
 # Edge purge endpoints
 EDGE_NODES = [
-    "http://192.168.236.181:3001",
-    "http://192.168.236.181:3002",
-    "http://192.168.236.181:3003"
+    f"{os.getenv("EDGE_URL_A")}:3001",
+    f"{os.getenv("EDGE_URL_B")}:3002",
+    f"{os.getenv("EDGE_URL_C")}:3003"
 ]
 
 os.makedirs(CONTENT_DIR, exist_ok=True)
