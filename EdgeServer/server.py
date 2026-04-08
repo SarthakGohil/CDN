@@ -60,7 +60,7 @@ def get_file(filename):
         print(f"[CACHE MISS] {filename}")
         try:
             # Origin (code2) takes 2 seconds to respond, timeout set to 10s to be safe
-            origin_resp = requests.get(f"{ORIGIN_URL}/content/{filename}", timeout=10)
+            origin_resp = requests.get(f"{ORIGIN_URL}/content/{filename}", timeout=20)
             if origin_resp.status_code != 200:
                 return "Origin file not found", origin_resp.status_code
             content = origin_resp.content
