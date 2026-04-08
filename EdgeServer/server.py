@@ -38,9 +38,11 @@ def get_file(filename):
     print(f"Received request for {filename}")
     # 1. Load Shedding Check
     with conn_lock:
-        if active_connections > 10:
+        if active_connections >= 10:
+            print(f"[BUSY] Rejecting {filename}")
             return "BUSY", 503
         active_connections += 1
+        print(f"[IN] {filename} | Active: {active_connections}")
 
     try:
         # 2. Check Cache
@@ -48,12 +50,14 @@ def get_file(filename):
 
         if cached_content is not None:
             # CASE 1: CACHE HIT
+            print(f"[CACHE HIT] {filename}")
             time.sleep(0.1)
             response = Response(cached_content)
             response.headers['X-Cache'] = 'HIT'
             return response
 
         # 3. CASE 2: CACHE MISS
+        print(f"[CACHE MISS] {filename}")
         try:
             # Origin (code2) takes 2 seconds to respond, timeout set to 10s to be safe
             origin_resp = requests.get(f"{ORIGIN_URL}/content/{filename}", timeout=10)
@@ -74,6 +78,7 @@ def get_file(filename):
         # 4. Release Connection Count
         with conn_lock:
             active_connections -= 1
+            print(f"[OUT] {filename} | Active: {active_connections}")
 
 if __name__ == '__main__':
     # Ports required by Traffic Manager: 3001, 3002, 3003
