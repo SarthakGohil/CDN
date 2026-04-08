@@ -22,6 +22,9 @@ class Cache:
 
     def set(self, key, data):
         # If cache full → remove LRU
+        if key in self.store:
+            self.store[key] = (data, time.time(), time.time())
+            return
         if len(self.store) >= self.max_size:
             lru_key = min(self.store.items(), key=lambda x: x[1][2])[0]
             del self.store[lru_key]

@@ -18,7 +18,10 @@ ORIGIN_URL = os.getenv("ORIGIN_URL")+":5000"
 # --- LOAD MANAGEMENT STATE ---
 active_connections = 0
 conn_lock = threading.Lock()
-
+# --- METRICS ---
+cache_hits = 0
+cache_misses = 0
+metrics_lock = threading.Lock()
 
 
 cache = Cache(max_size=5,ttl=60)
@@ -36,6 +39,19 @@ def health():
 def purge_cache(filename):
     cache.delete(filename)
     return jsonify({"status": "purged", "file": filename}), 200
+
+@app.route('/metrics', methods=['GET'])
+def metrics():
+    with metrics_lock:
+        total = cache_hits + cache_misses
+        hit_ratio = cache_hits / total if total > 0 else 0
+
+        return jsonify({
+            "hits": cache_hits,
+            "misses": cache_misses,
+            "hit_ratio": hit_ratio,
+            "cache_size": len(cache.store)
+        })
 
 @app.route('/file/<filename>', methods=['GET'])
 def get_file(filename):
@@ -56,6 +72,11 @@ def get_file(filename):
         if cached_content is not None:
             # CASE 1: CACHE HIT
             print(f"[CACHE HIT] {filename}")
+
+            global cache_hits
+            with metrics_lock:
+                cache_hits += 1
+
             time.sleep(0.1)
             response = Response(cached_content)
             response.headers['X-Cache'] = 'HIT'
@@ -63,6 +84,9 @@ def get_file(filename):
 
         # 3. CASE 2: CACHE MISS
         print(f"[CACHE MISS] {filename}")
+        global cache_misses
+        with metrics_lock:
+            cache_misses += 1
         try:
             # Origin (code2) takes 2 seconds to respond, timeout set to 10s to be safe
             origin_resp = requests.get(f"{ORIGIN_URL}/content/{filename}", timeout=20)
