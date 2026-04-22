@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo } from 'react'
-import ReactFlow, { Background, Controls, Handle, MiniMap, Position, ReactFlowProvider, useStore } from 'react-flow-renderer'
+import ReactFlow, { Background, Controls, Handle, Position, ReactFlowProvider, useStore } from 'react-flow-renderer'
 import { useCdnStore } from '../store/cdnStore'
 
 function CdnNode({ data }) {
@@ -131,7 +131,6 @@ function CDNCanvasInner() {
         panOnDrag
       >
         <Background color="rgba(148,163,184,0.15)" gap={24} />
-        <MiniMap pannable zoomable />
         <Controls />
         <PacketLayer />
       </ReactFlow>

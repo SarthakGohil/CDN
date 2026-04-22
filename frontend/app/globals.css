@@ -2,12 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  height: 100%;
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: #050a14;
+  margin: 0;
+  background: #000;
   color: #e5e7eb;
 }
+
+/* Custom Tailwind color classes used in components */
+.bg-panel   { background-color: #0b1220; }
+.bg-surface { background-color: #0f1a2e; }
+.shadow-glow { box-shadow: 0 0 24px rgba(34,211,238,0.25); }
+
+/* Thin scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 4px; }
+
+/* ReactFlow overrides */
+.react-flow__minimap-mask { fill: rgba(0,0,0,0.55); }
